@@ -1,4 +1,5 @@
 #splatting rules  - just for fun
+# deploy arm template with object parameters by Spl@tting
 $DeploymentParameters = @{
     Name                    = "MyBicepDeployment0001"
     ResourceGroupName       = "rg-lga-001"
@@ -12,7 +13,7 @@ $DeploymentParameters = @{
 }
 
 New-AzresourceGroupDeployment @DeploymentParameters
-# deploy arm template with object parameters by Spl@tting
+
 
 # deploy arm with templatefile and template parameters
 New-AzresourceGroupDeployment -Name "MyBicepDeployment" `
