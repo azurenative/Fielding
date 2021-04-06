@@ -1,0 +1,70 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "logAnalyticsName": {
+      "type": "string"
+    }
+  },
+  "functions": [],
+  "variables": {
+    "location": "[resourceGroup().location]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2020-08-01",
+      "name": "[parameters('logAnalyticsName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "sku": {
+          "name": "PerGB2018"
+        },
+        "retentionInDays": 30
+      }
+    },
+    {
+      "type": "Microsoft.OperationalInsights/workspaces/dataSources",
+      "apiVersion": "2015-11-01-preview",
+      "name": "[format('{0}/LogicalDisk1', parameters('logAnalyticsName'))]",
+      "kind": "WindowsPerformanceCounter",
+      "properties": {
+        "objectName": "LogicalDisk",
+        "instanceName": "*",
+        "intervalSeconds": 300,
+        "counterName": "Avg Disk sec/Read"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.OperationalInsights/workspaces/dataSources",
+      "apiVersion": "2015-11-01-preview",
+      "name": "[format('{0}/LogicalDisk2', parameters('logAnalyticsName'))]",
+      "kind": "WindowsPerformanceCounter",
+      "properties": {
+        "objectName": "LogicalDisk",
+        "instanceName": "*",
+        "intervalSeconds": 300,
+        "counterName": "Avg Disk sec/Write"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsName'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "LogAnalyticsName": {
+      "type": "string",
+      "value": "[parameters('logAnalyticsName')]"
+    }
+  },
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.3.126.58533",
+      "templateHash": "4455690380117488344"
+    }
+  }
+}
