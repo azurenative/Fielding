@@ -4,16 +4,8 @@ param location string
 param logManagementResourceGroupName string
 param logAnalyticsName string
 
-resource ResourceGroupLogManagement 'Microsoft.Resources/resourceGroups@2020-06-01' = {
-  name: logManagementResourceGroupName
-  location: location
-}
-
 module logAnalytics './modules/logAnalytics.bicep' = {
   name: 'LogAnalytics'
-  dependsOn: [
-    ResourceGroupLogManagement
-  ]
   scope: resourceGroup(logManagementResourceGroupName)
   params: {
     logAnalyticsName: logAnalyticsName

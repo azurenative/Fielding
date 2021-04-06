@@ -26,3 +26,5 @@ this repository contains 101 training content on Azure, Bicep and Azure DevOps
 [VSCODE cheatsheet for Windows](https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf)
 
 [Markdown cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
+
+[Powershell C00l Spl@ting](https://adamtheautomator.com/powershell-splatting/)

@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "logManagementResourceGroupName": {
-      "value": "rg-la-01"
+      "value": "rg-lga-001"
     },
     "logAnalyticsName": {
-      "value": "LAW-AZP-001"
+      "value": "la-wp-001"
     },
     "location": {
       "value": "westeurope"
