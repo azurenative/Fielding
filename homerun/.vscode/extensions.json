@@ -1,0 +1,22 @@
+{
+  "recommendations": [
+    "davidanson.vscode-markdownlint",
+    "ms-azure-devops.azure-pipelines",
+    "ms-vscode.powershell-preview",
+    "vscode-icons-team.vscode-icons",
+    "rosshamish.kuskus-kusto-syntax-highlighting",
+    "bierner.markdown-mermaid",
+    "bpruitt-goddard.mermaid-markdown-syntax-highlighting",
+    "ms-azuretools.vscode-azurefunctions",
+    "ms-azuretools.vscode-azureresourcegroups",
+    "ms-azuretools.vscode-bicep",
+    "ms-dotnettools.vscode-dotnet-runtime",
+    "ms-vscode.azurecli",
+    "ms-vscode.powershell",
+    "msazurermtools.azurerm-vscode-tools",
+    "redhat.vscode-yaml",
+    "vscode-icons-team.vscode-icons",
+    "vstirbu.vscode-mermaid-preview",
+    "ZainChen.json"
+  ]
+}
