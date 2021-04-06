@@ -10,7 +10,7 @@ this repository contains 101 training content on Azure, Bicep and Azure DevOps
 
 3. Prepare and install bicep tools(bicep.exe and assemblies)
 
-4. Fielding a bicep template
+4. Fielding a bicep template (Start with your ARM not your Bicep!?!?)
 
 5. Do i still need an arm template ???(decompile and play)
 

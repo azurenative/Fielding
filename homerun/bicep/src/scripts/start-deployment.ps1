@@ -1,20 +1,24 @@
 #splatting rules  - just for fun
-$BicepParameters = @{
-    location                       = "westeurope"
-    logManagementResourceGroupName = "rg-lga-001"
-    logAnalyticsName               = "la-wp-001"
+$DeploymentParameters = @{
+    Name                    = "MyBicepDeployment0001"
+    ResourceGroupName       = "rg-lga-001"
+    Mode                    = "Incremental"
+    TemplateFile            = ".\homerun\bicep\src\mainDeployment.bicep"
+    TemplateParameterObject = @{
+        location                       = "westeurope"
+        logManagementResourceGroupName = "rg-lga-001"
+        logAnalyticsName               = "la-wp-002"
+    }
 }
 
-# deploy arm template with object parameters
-New-AzresourceGroupDeployment -Name "MyBicepDeployment" `
-    -ResourceGroupName "rg-lga-001" `
-    -Mode Incremental `
-    -TemplateFile ".\homerun\bicep\src\mainDeployment.bicep" `
-    -TemplateParameterObject $BicepParameters
+New-AzresourceGroupDeployment @DeploymentParameters
+# deploy arm template with object parameters by Spl@tting
 
-# deploy arm with template parameters
+# deploy arm with templatefile and template parameters
 New-AzresourceGroupDeployment -Name "MyBicepDeployment" `
     -ResourceGroupName "rg-lga-001" `
     -Mode Incremental `
     -TemplateFile ".\homerun\bicep\src\mainDeployment.bicep" `
     -TemplateParameterFile ".\homerun\bicep\src\parameters.arm..json"
+
+#note not needed to build the bicep template to ARM when using powershell cmdlet .
