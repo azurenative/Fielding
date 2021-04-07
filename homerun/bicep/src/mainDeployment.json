@@ -1,0 +1,182 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string"
+    },
+    "logManagementResourceGroupName": {
+      "type": "string"
+    },
+    "logAnalyticsName": {
+      "type": "string"
+    }
+  },
+  "functions": [],
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "LogAnalytics",
+      "resourceGroup": "[parameters('logManagementResourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "logAnalyticsName": {
+            "value": "[parameters('logAnalyticsName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "logAnalyticsName": {
+              "type": "string"
+            }
+          },
+          "functions": [],
+          "variables": {
+            "location": "[resourceGroup().location]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.OperationalInsights/workspaces",
+              "apiVersion": "2020-08-01",
+              "name": "[parameters('logAnalyticsName')]",
+              "location": "[variables('location')]",
+              "properties": {
+                "sku": {
+                  "name": "PerGB2018"
+                },
+                "retentionInDays": 30
+              }
+            },
+            {
+              "type": "Microsoft.OperationalInsights/workspaces/dataSources",
+              "apiVersion": "2015-11-01-preview",
+              "name": "[format('{0}/LogicalDisk1', parameters('logAnalyticsName'))]",
+              "kind": "WindowsPerformanceCounter",
+              "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 300,
+                "counterName": "Avg Disk sec/Read"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.OperationalInsights/workspaces/dataSources",
+              "apiVersion": "2015-11-01-preview",
+              "name": "[format('{0}/LogicalDisk2', parameters('logAnalyticsName'))]",
+              "kind": "WindowsPerformanceCounter",
+              "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": 300,
+                "counterName": "Avg Disk sec/Write"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "LogAnalyticsName": {
+              "type": "string",
+              "value": "[parameters('logAnalyticsName')]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "workbookDashboardView_APT",
+      "resourceGroup": "[parameters('logManagementResourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "workbookDisplayName": {
+            "value": "workbook_Dashboard_View_apt"
+          },
+          "workbookSourceId": {
+            "value": "azure monitor"
+          },
+          "workbookType": {
+            "value": "workbook"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "workbookDisplayName": {
+              "type": "string",
+              "metadata": {
+                "description": "The friendly name for the workbook that is used in the Gallery or Saved List.  This name must be unique within a resource group."
+              }
+            },
+            "workbookType": {
+              "type": "string",
+              "metadata": {
+                "description": "The gallery that the workbook will been shown under. Supported values include workbook, tsg, etc. Usually, this is 'workbook'"
+              }
+            },
+            "workbookSourceId": {
+              "type": "string",
+              "metadata": {
+                "description": "The id of resource instance to which the workbook will be associated"
+              }
+            },
+            "workbookId": {
+              "type": "string",
+              "defaultValue": "[newGuid()]",
+              "metadata": {
+                "description": "The unique guid for this workbook instance"
+              }
+            }
+          },
+          "functions": [],
+          "resources": [
+            {
+              "type": "microsoft.insights/workbooks",
+              "apiVersion": "2018-06-17-preview",
+              "name": "[parameters('workbookId')]",
+              "location": "[resourceGroup().location]",
+              "kind": "shared",
+              "properties": {
+                "displayName": "[parameters('workbookDisplayName')]",
+                "serializedData": "{\"version\":\"Notebook/1.0\",\"items\":[{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"Perf\\r\\n| where TimeGenerated > ago(7d)\\r\\n| where CounterName == \\\"% Processor Time\\\" and InstanceName == \\\"_Total\\\" \\r\\n| project TimeGenerated, Computer, ObjectName, CounterName, InstanceName, round(CounterValue, 2)\\r\\n| summarize arg_max(TimeGenerated, *) by Computer\",\"size\":1,\"title\":\"%CPU utilization by Computer\",\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\",\"crossComponentResources\":[\"/subscriptions/d395dff9-7546-438a-b9b6-6fb17f94ca23/resourceGroups/rg-lga-001/providers/Microsoft.OperationalInsights/workspaces/lga-001-we\"],\"visualization\":\"tiles\",\"tileSettings\":{\"showBorder\":false,\"titleContent\":{\"columnMatch\":\"Computer\",\"formatter\":1},\"leftContent\":{\"columnMatch\":\"CounterValue\",\"formatter\":12,\"formatOptions\":{\"palette\":\"auto\"},\"numberFormat\":{\"unit\":17,\"options\":{\"maximumSignificantDigits\":3,\"maximumFractionDigits\":2}}}}},\"customWidth\":\"50\",\"name\":\"query - 4\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"// Bottom 10 Free disk space % \\r\\n// Bottom 10 Free disk space % by computer, for the last 7 days. \\r\\nPerf\\r\\n| where TimeGenerated > ago(7d)\\r\\n| where (ObjectName == \\\"Logical Disk\\\" or ObjectName == \\\"LogicalDisk\\\") and CounterName contains \\\"%\\\" and InstanceName != \\\"_Total\\\" and InstanceName != \\\"HarddiskVolume1\\\"\\r\\n| project TimeGenerated, Computer, ObjectName, CounterName, InstanceName, CounterValue \\r\\n| summarize arg_max(TimeGenerated, *) by Computer\\r\\n| top 10 by CounterValue desc\",\"size\":1,\"aggregation\":2,\"title\":\"Free disk space % by Computer\",\"timeContext\":{\"durationMs\":86400000},\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\",\"crossComponentResources\":[\"/subscriptions/d395dff9-7546-438a-b9b6-6fb17f94ca23/resourceGroups/rg-lga-001/providers/microsoft.operationalinsights/workspaces/lga-001-we\"],\"visualization\":\"tiles\",\"tileSettings\":{\"showBorder\":false,\"titleContent\":{\"columnMatch\":\"Computer\",\"formatter\":1},\"leftContent\":{\"columnMatch\":\"CounterValue\",\"formatter\":12,\"formatOptions\":{\"palette\":\"auto\"},\"numberFormat\":{\"unit\":17,\"options\":{\"maximumSignificantDigits\":3,\"maximumFractionDigits\":2}}}}},\"name\":\"query - 6\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"// Memory and CPU usage \\r\\n// Chart all computers' used memory and CPU, over the last hour. \\r\\nPerf\\r\\n| where TimeGenerated > ago(1h)\\r\\n| where (CounterName == \\\"% Processor Time\\\" and InstanceName == \\\"_Total\\\") or CounterName == \\\"% Used Memory\\\"\\r\\n| project TimeGenerated, CounterName, CounterValue, Computer\\r\\n| summarize arg_max(TimeGenerated, *) by Computer\\r\\n\",\"size\":1,\"title\":\"% Memory Usage by Computer\",\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\",\"crossComponentResources\":[\"/subscriptions/d395dff9-7546-438a-b9b6-6fb17f94ca23/resourceGroups/rg-lga-001/providers/Microsoft.OperationalInsights/workspaces/lga-001-we\"],\"visualization\":\"tiles\",\"tileSettings\":{\"showBorder\":false,\"titleContent\":{\"columnMatch\":\"Computer\",\"formatter\":1},\"leftContent\":{\"columnMatch\":\"CounterValue\",\"formatter\":12,\"formatOptions\":{\"palette\":\"auto\"},\"numberFormat\":{\"unit\":17,\"options\":{\"maximumSignificantDigits\":3,\"maximumFractionDigits\":2}}}},\"graphSettings\":{\"type\":2,\"topContent\":{\"columnMatch\":\"Computer\",\"formatter\":1,\"formatOptions\":{}},\"centerContent\":{\"columnMatch\":\"CounterValue\",\"formatter\":1,\"formatOptions\":{},\"numberFormat\":{\"unit\":17,\"options\":{\"style\":\"decimal\",\"useGrouping\":false,\"maximumFractionDigits\":2,\"maximumSignificantDigits\":3}}},\"nodeIdField\":\"Computer\",\"nodeSize\":null,\"staticNodeSize\":65,\"colorSettings\":{\"nodeColorField\":\"CounterValue\",\"type\":4,\"heatmapPalette\":\"greenRed\",\"heatmapMin\":0,\"heatmapMax\":100},\"hivesMargin\":3},\"mapSettings\":{\"locInfo\":\"LatLong\",\"sizeSettings\":\"CounterValue\",\"sizeAggregation\":\"Sum\",\"legendMetric\":\"CounterValue\",\"legendAggregation\":\"Sum\",\"itemColorSettings\":{\"type\":\"heatmap\",\"colorAggregation\":\"Sum\",\"nodeColorField\":\"CounterValue\",\"heatmapPalette\":\"greenRed\"}}},\"customWidth\":\"33\",\"name\":\"query - 2\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"Heartbeat\\r\\n| summarize arg_max(TimeGenerated, *) by Computer\",\"size\":1,\"title\":\"Last HeartBeat by Computer\",\"timeContext\":{\"durationMs\":86400000},\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\",\"crossComponentResources\":[\"/subscriptions/d395dff9-7546-438a-b9b6-6fb17f94ca23/resourceGroups/rg-lga-001/providers/microsoft.operationalinsights/workspaces/lga-001-we\"],\"visualization\":\"tiles\",\"tileSettings\":{\"showBorder\":false,\"titleContent\":{\"columnMatch\":\"Computer\",\"formatter\":1},\"leftContent\":{\"columnMatch\":\"RemoteIPLongitude\",\"formatter\":12,\"formatOptions\":{\"palette\":\"auto\"},\"numberFormat\":{\"unit\":17,\"options\":{\"maximumSignificantDigits\":3,\"maximumFractionDigits\":2}}}},\"graphSettings\":{\"type\":0,\"topContent\":{\"columnMatch\":\"Computer\",\"formatter\":1},\"centerContent\":{\"columnMatch\":\"RemoteIPLongitude\",\"formatter\":1,\"numberFormat\":{\"unit\":17,\"options\":{\"maximumSignificantDigits\":3,\"maximumFractionDigits\":2}}}}},\"name\":\"query - 5\"}],\"isLocked\":false,\"fallbackResourceIds\":[\"azure monitor\"]}",
+                "version": "1.0",
+                "sourceId": "[parameters('workbookSourceId')]",
+                "category": "[parameters('workbookType')]"
+              }
+            }
+          ],
+          "outputs": {
+            "workbookId": {
+              "type": "string",
+              "value": "[resourceId('microsoft.insights/workbooks', parameters('workbookId'))]"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.3.126.58533",
+      "templateHash": "11113425009239888848"
+    }
+  }
+}

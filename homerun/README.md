@@ -31,7 +31,7 @@ this repository contains 101 training content on Azure, Bicep and Azure DevOps
 
 [Powershell C00l Spl@ting](https://adamtheautomator.com/powershell-splatting/)
 
-
+[create your first azure pipeline](https://docs.microsoft.com/en-us/azure/devops/pipelines/create-first-pipeline?view=azure-devops&tabs=java%2Ctfs-2018-2%2Cbrowser)
 
 
 
@@ -67,26 +67,3 @@ resource <symbolic-name> '<type>@<api-version>` = {
   }
 }
 ```
-The different elements (as seen by the placeholders in the above example) of the Azure resource declaration in Azure Bicep code are as follows:
-
-resource keyword – Use for declaring the block of code that defines Azure Resources to deploy
-Symbolic name – This is an identifier (or name) within the Azure Bicep file that can be used to reference this resource in other locations within the bicep file.
-Keep in mind, this is not the name of the Azure resource that is deployed; this name is only for referencing this resource within the Azure Bicep code.
-
-Type – This is the Azure Resource Type name for the resource that is being declared. This is composed of the Azure Resource Provider name (such as Microsoft.Storage), and the resource type (such as storageAccounts).
-The full Azure resource type value for an Azure Storage Account is Microsoft.Storage/storageAccounts.
-
-API Version – After the Azure resource type, separated by an @ character, there needs to be an Azure Resource Provider apiVersion specified. This is a requirement that comes from Azure Resource Manager (ARM) and will be similar to the apiVersion specified in ARM Templates. For example, the API Version specified for an Azure Storage Account could be 2019-06-01.
-
-Properties – The resource properties are contained within the = { ... } block within the resource declaration.
-
-These will be the specific properties required for the specific Azure resource type declared.
-
-All these properties will be the same properties required by an ARM Template when declaring the same Azure resource type.
-The combination of the type and api version for the full Azure Resource Manager resource type that the resulting ARM Template will deploy.
-
-Both of these values must be specified for all Azure resources declared within Azure Bicep code.
-
-Keep in mind that the valid values to use here are the same as what’s accepted within ARM Templates.
-
-As a result, Azure Bicep will automatically accept any valid ARM resource type and api version without any updated necessary for Azure Bicep to support it.
