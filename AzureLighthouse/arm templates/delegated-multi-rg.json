@@ -74,6 +74,37 @@
                 "managedByTenantId": "[parameters('managedByTenantId')]",
                 "authorizations": "[parameters('authorizations')]"
             }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2018-05-01",
+            "name": "[concat('rgAssignment', copyIndex())]",
+            "resourceGroup": "[parameters('resourceGroups')[copyIndex()].rgName]",
+            "copy": {
+                "name": "deploymentCopy",
+                "count": "[length(parameters('resourceGroups'))]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ManagedServices/registrationDefinitions/', variables('mspRegistrationName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "resources": [
+                        {
+                            "type": "Microsoft.ManagedServices/registrationAssignments",
+                            "apiVersion": "2019-06-01",
+                            "name": "[guid(parameters('resourceGroups')[copyIndex()].rgName)]",
+                            "properties": {
+                                "registrationDefinitionId": "[resourceId('Microsoft.ManagedServices/registrationDefinitions/', variables('mspRegistrationName'))]"
+                            }
+                        }
+                    ]
+                }
+            }
         }
     ],
     "outputs": {
