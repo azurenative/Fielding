@@ -21,7 +21,7 @@ this repository contains 101 training content on Azure, Bicep and Azure DevOps
 ### References:
 [HowTo install Bicep tools](https://github.com/Azure/bicep/blob/main/docs/installing.md)
 
-[Dwonload MSI for windows](https://github.com/Azure/bicep/blob/main/docs/installing.md#windows-installer)
+[Download MSI for windows](https://github.com/Azure/bicep/blob/main/docs/installing.md#windows-installer)
 
 [Official Azure Bicep Github](https://github.com/Azure/bicep)
 
