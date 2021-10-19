@@ -1,0 +1,57 @@
+parameters:
+  - name: SubscriptionId
+    type: string
+  - name: Location
+    type: string
+  - name: AzureResourceManagerConnection
+    type: string
+  - name: csmFile
+    type: string
+  - name: CsmParametersFile
+    type: string
+  - name: updateServiceTemplateFilePath
+    type: string
+
+jobs:
+  - job: DeployToEnvironment
+    displayName: Deploy ARM template to Environment
+    steps:
+    - task: DownloadBuildArtifacts@0
+      displayName: Download Build Artifacts
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'drop'
+        downloadPath: '$(System.DefaultWorkingDirectory)'
+
+    - task: AzureResourceManagerTemplateDeployment@3
+      displayName: Deploy mainTemplate
+      inputs:
+        azureResourceManagerConnection: ${{ parameters.azureResourceManagerConnection }}
+        deploymentScope: 'Subscription'
+        subscriptionId: '${{ parameters.SubscriptionId }}'
+        location: '${{parameters.Location}}'
+        templateLocation: 'Linked artifact'
+        csmFile: '${{ parameters.csmFile }}'
+        csmParametersFile: '${{ parameters.CsmParametersFile }}'
+        deploymentMode: 'Incremental'
+        deploymentOutputs: 'updateManagementGroupName'
+
+    - task: PowerShell@2
+      displayName: 'pre-step Update Service'
+      inputs:
+        targetType: 'inline'
+        script: |
+            $resourceGroup = ConvertFrom-Json '$(updateManagementGroupName)'
+            $rgname = $resourceGroup.updateManagementGroupName.value
+            Write-Output "##vso[task.setvariable variable=updatemanagementgroup]$rgname"
+
+    - task: AzurePowerShell@5
+      displayName: 'Deploy Update Service'
+      inputs:
+        azureSubscription: '${{ parameters.AzureResourceManagerConnection }}'
+        pwsh: false
+        ScriptType: 'FilePath'
+        ScriptPath: '$(System.DefaultWorkingDirectory)/drop/scripts/enable-updateservice.ps1'
+        ScriptArguments: '-resourceGroupName "$(updatemanagementgroup)" -subscriptionId ${{parameters.SubscriptionId}} -templateFilePath ${{parameters.updateServiceTemplateFilePath}}'
+        azurePowerShellVersion: 'LatestVersion'

@@ -1,0 +1,52 @@
+# TODO: if needed cron job here to schedule this pipeline
+parameters:
+  - name: azureResourceManagerConnection
+    type: string
+  - name: artifactPath
+    type: string
+  - name: isProduction
+    type: string
+  - name: isWorkload
+    type: string
+  - name: resourceGroupNameNe
+    type: string
+  - name: resourceGroupNameWe
+    type: string
+  - name: subscriptionId
+    type: string
+
+jobs:
+  - job:
+    displayName: 'Deploy Ring Schedule'
+    steps:
+    - download: Current
+      name: Download
+      artifact: Scripts
+    - task: AzurePowerShell@5
+      displayName: 'Create Ring schedule west europe'
+      inputs:
+        azureSubscription: '${{ parameters.azureResourceManagerConnection }}'
+        pwsh: false
+        azurePowerShellVersion: 'LatestVersion'
+        ScriptType: 'FilePath'
+        ScriptPath: '$(Pipeline.Workspace)/Scripts/new-ringscheduleupdateservice.ps1'
+        ScriptArguments: > 
+          -artifactPath ${{parameters.artifactPath}} 
+          -resourceGroupName ${{parameters.resourceGroupNameWe}}
+          -isProduction ${{parameters.isProduction}}
+          -isWorkload ${{parameters.isWorkload}}
+          -subscriptionId ${{parameters.subscriptionId}}
+    - task: AzurePowerShell@5
+      displayName: 'Create Ring schedule north europe'
+      inputs:
+        azureSubscription: '${{ parameters.azureResourceManagerConnection }}'
+        pwsh: false
+        azurePowerShellVersion: 'LatestVersion'
+        ScriptType: 'FilePath'
+        ScriptPath: '$(Pipeline.Workspace)/Scripts/new-ringscheduleupdateservice.ps1'
+        ScriptArguments: > 
+          -artifactPath ${{parameters.artifactPath}} 
+          -resourceGroupName ${{parameters.resourceGroupNameNe}}
+          -isProduction ${{parameters.isProduction}}
+          -isWorkload ${{parameters.isWorkload}}
+          -subscriptionId ${{parameters.subscriptionId}}

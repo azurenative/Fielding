@@ -1,0 +1,59 @@
+# TODO: if needed cron job here to schedule this pipeline
+trigger: none
+pool:
+   vmImage: windows-latest
+variables:
+      TestAzureResourceManagerConnection: 'Test Management Group'
+      TestSubscriptionId: 'ce6b3c97-19ab-40dc-8672-636e1f20b74e'
+      TestweuUpdateManagementGroup: "UpdateManagement.WestEurope.Test"
+      TestneuUpdateManagementGroup: "UpdateManagement.NorthEurope.Test"
+      ProdAzureResourceManagerConnection: 'AzureInitiative Management Group'
+      ProdSubscriptionId: '8ab8730f-bf44-4119-bf7a-5e358a40fbc6'
+      ProdweuUpdateManagementGroup: "UpdateManagement.WestEurope"
+      ProdneuUpdateManagementGroup: "UpdateManagement.NorthEurope"
+      kbArtifactFileName: "kblist.txt"
+
+stages:
+  - stage: 'DeployRing0ScheduleTest'
+    displayName: Deploy Ring 0 Non-Production
+    jobs:
+    - template: ringscheduleDeploymentBuild.yml
+      parameters:
+        azureResourceManagerConnection: ${{variables.TestAzureResourceManagerConnection}}
+        artifactPath: $(Build.SourcesDirectory)
+        isProduction: $False
+        isWorkload: $False  
+        resourceGroupNameWe: ${{variables.TestweuUpdateManagementGroup}}
+        resourceGroupNameNe: ${{variables.TestneuUpdateManagementGroup}}
+        subscriptionId: ${{variables.TestSubscriptionId}}
+
+  - stage: DeployRing12ScheduleTestWorkloadsProduction
+    displayName: Deploy Ring 1 & 2 Production
+    jobs:
+    - template: ringscheduleDeployment.yml
+      parameters:
+        azureResourceManagerConnection: ${{variables.ProdAzureResourceManagerConnection}}
+        artifactPath: '$(Pipeline.Workspace)'
+        IsProduction: $False
+        IsWorkload: $True        
+        resourceGroupNameWe: ${{variables.ProdweuUpdateManagementGroup}}
+        resourceGroupNameNe: ${{variables.ProdneuUpdateManagementGroup}}
+        subscriptionId: ${{variables.ProdSubscriptionId}}
+    - template: ringscheduleDeployment.yml
+      parameters:
+        azureResourceManagerConnection: ${{variables.ProdAzureResourceManagerConnection}}
+        artifactPath: '$(Pipeline.Workspace)'
+        IsProduction: $True
+        IsWorkload: $False      
+        resourceGroupNameWe: ${{variables.ProdweuUpdateManagementGroup}}
+        resourceGroupNameNe: ${{variables.ProdneuUpdateManagementGroup}}
+        subscriptionId: ${{variables.ProdSubscriptionId}}
+    - template: ringscheduleDeployment.yml
+      parameters:
+        azureResourceManagerConnection: ${{variables.ProdAzureResourceManagerConnection}}
+        artifactPath: '$(Pipeline.Workspace)'
+        IsProduction: $True
+        IsWorkload: $True        
+        resourceGroupNameWe: ${{variables.ProdweuUpdateManagementGroup}}
+        resourceGroupNameNe: ${{variables.ProdneuUpdateManagementGroup}}
+        subscriptionId: ${{variables.ProdSubscriptionId}}

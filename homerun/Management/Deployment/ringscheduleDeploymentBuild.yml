@@ -1,0 +1,46 @@
+jobs:
+  - job:
+    displayName: Build Ring0 Schedule
+    steps:
+    - task: AzurePowerShell@5
+      displayName: 'Create Ring schedule west europe'
+      inputs:
+        azureSubscription: '${{ parameters.azureResourceManagerConnection }}'
+        pwsh: false
+        azurePowerShellVersion: 'LatestVersion'
+        ScriptType: 'FilePath'
+        ScriptPath: '$(Build.SourcesDirectory)/Resources/Management/Scripts/new-ringscheduleupdateservice.ps1'
+        ScriptArguments: > 
+          -artifactPath ${{parameters.artifactPath}} 
+          -resourceGroupName ${{parameters.resourceGroupNameWe}}
+          -isProduction ${{parameters.isProduction}}
+          -isWorkload ${{parameters.isWorkload}}
+          -subscriptionId ${{parameters.subscriptionId}}
+    - task: AzurePowerShell@5
+      displayName: 'Create Ring schedule north europe'
+      inputs:
+        azureSubscription: '${{ parameters.azureResourceManagerConnection }}'
+        pwsh: false
+        azurePowerShellVersion: 'LatestVersion'
+        ScriptType: 'FilePath'
+        ScriptPath: '$(Build.SourcesDirectory)/Resources/Management/Scripts/new-ringscheduleupdateservice.ps1'
+        ScriptArguments: > 
+          -artifactPath ${{parameters.artifactPath}} 
+          -resourceGroupName ${{parameters.resourceGroupNameNe}}
+          -isProduction ${{parameters.isProduction}}
+          -isWorkload ${{parameters.isWorkload}}
+          -subscriptionId ${{parameters.subscriptionId}}
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Scripts Artifact'
+      inputs:
+        targetPath: 'Resources\Management\Scripts'
+        artifact: Scripts
+        PathtoPublish: '$(Pipeline.Workspace)'
+        publishLocation: 'pipeline'
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish KB Artifact'
+      inputs:
+        targetPath: 'KB'
+        artifact: KB
+        PathtoPublish: '$(Pipeline.Workspace)'
+        publishLocation: 'pipeline'

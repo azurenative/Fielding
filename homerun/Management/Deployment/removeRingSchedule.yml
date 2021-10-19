@@ -1,0 +1,36 @@
+trigger: none
+pool:
+   vmImage: windows-latest
+variables:
+  ProdAzureResourceManagerConnection: 'AzureInitiative Management Group'
+  ProdSubscriptionId: '8ab8730f-bf44-4119-bf7a-5e358a40fbc6'
+
+jobs:
+  - job:
+    displayName: 'Remove Ring Schedule'
+    steps:
+    - task: AzurePowerShell@5
+      displayName: 'Remove Ring Schedule'
+      inputs:
+        azureSubscription: '${{ variables.ProdAzureResourceManagerConnection }}'
+        pwsh: false
+        azurePowerShellVersion: 'LatestVersion'
+        ScriptType: 'InlineScript'
+        Inline:         |                
+                Select-Azsubscription -subscription ${{variables.ProdSubscriptionId}}
+                Write-Output -message "Removing deploymentupdateservice-Windows-ring1-workload"
+                Remove-AzAutomationSoftwareUpdateConfiguration -Name "deploymentupdateservice-Windows-ring1-workload" `
+                  -ResourceGroupName "UpdateManagement.NorthEurope" `
+                  -AutomationAccountName "AUTOM-AZP-002" `
+                  -Verbose
+                Write-Output -message "Removing deploymentupdateservice-Linux-all" -Verbose
+                Remove-AzAutomationSoftwareUpdateConfiguration -Name "deploymentupdateservice-Linux-all" `
+                  -ResourceGroupName "UpdateManagement.NorthEurope" `
+                  -AutomationAccountName "AUTOM-AZP-002" `
+                  -Verbose
+                Write-Output -message "Removing deploymentupdateservice-Windows-ring2" -Verbose
+                Remove-AzAutomationSoftwareUpdateConfiguration -Name "deploymentupdateservice-windows-ring2" `
+                  -ResourceGroupName "UpdateManagement.NorthEurope" `
+                  -AutomationAccountName "AUTOM-AZP-002" `
+                  -Verbose
+                

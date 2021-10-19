@@ -1,0 +1,90 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "automationAccountName": {
+            "value": "AUTOM-AZP-002"
+        },
+        "storageAccountName": {
+            "value": "logflowstoragenortheu"
+        },
+        "logAnalyticsName": {
+            "value": "LAW-AZP-002"
+        },
+        "azureEnvironment":{
+            "value": "prod"
+        },
+        "managedIdentityName": {
+            "value": "ManagedIdentityBlueprintAssignment"
+        },
+        "managedIdentitiesResourceGroupName":{
+            "value": "ManagedIdentities"
+        },
+        "fileStagingResourceGroupName":{
+            "value": "FileStaging.NorthEurope"
+        },
+        "fileStagingstorageAccountName":{
+            "value": "sqnfstagingneprod"
+        },
+        "secretManagementResourceGroupName":{
+            "value": "SecretManagement.NorthEurope"
+        },
+        "logManagementResourceGroupName":{
+            "value": "LogManagement.NorthEurope"
+        },
+        "logManagementActionGroupName": {
+            "value": "AG-AZP-WorkloadAlerts-002"
+        },
+        "logManagementActionGroupShortName": {
+            "value": "AGAZP002"
+        },
+        "updateManagementResourceGroupName":{
+            "value": "UpdateManagement.NorthEurope"
+        },
+        "connectivityResourceGroupName":{
+            "value": "Networking.NorthEurope.Hub"
+        },
+        "connectivitySubscriptionId":{
+            "value": "232bbf91-29aa-47c7-b9f0-fe8f80600608"
+        },        
+        "virtualNetworkResourceGroupName":{
+            "value": "VirtualNetwork.NorthEurope"
+        },
+        "virtualNetworkName":{
+            "value": "NorthEurope.Hub"
+        },
+        "virtualNetworkAddressPrefix":{
+            "value": "10.0.3.0/24"
+        },
+        "sharedServicesSubnetAddressPrefix":{
+            "value": "10.0.3.0/26"
+        },
+        "location":{
+            "value": "northeurope"
+        },
+        "updateManagementName":{
+            "value": "Updates(LAW-AZP-002)"
+        },
+        "workbookDisplayName":{
+            "value": "WB-AZP-002"
+        },
+        "sharedDashboardName":{
+            "value": "SDB-AZP-002"
+        },
+        "actionGroupName": {
+            "value": "AUTOM-AGT-001"
+        },
+        "actionGroupShortName": {
+            "value": "ALERTUPDMGM"
+        },
+        "alertName": {
+            "value": "UpdateFailed"
+        },
+        "updateManagementGroupName": {
+            "value": "Update-MGMT-001"
+        },
+        "actionGroupLocation": {
+            "value": "global"
+        }
+    }
+}

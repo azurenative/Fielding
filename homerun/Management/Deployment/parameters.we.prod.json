@@ -1,0 +1,96 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "automationAccountName": {
+            "value": "AUTOM-AZP-001"
+        },
+        "storageAccountName": {
+            "value": "logflowstoragewesteu"
+        },
+        "logAnalyticsName": {
+            "value": "LAW-AZP-001"
+        },
+        "azureEnvironment":{
+            "value": "prod"
+        },
+        "managedIdentityName": {
+            "value": "ManagedIdentityBlueprintAssignment"
+        },
+        "managedIdentitiesResourceGroupName":{
+            "value": "ManagedIdentities"
+        },
+        "secretManagementResourceGroupName":{
+            "value": "SecretManagement.WestEurope"
+        },
+        "fileStagingstorageAccountName":{
+            "value": "sqnfstagingweprod"
+        },
+        "fileStagingResourceGroupName":{
+            "value": "FileStaging.WestEurope"
+        },
+        "updateManagementResourceGroupName": {
+            "value": "UpdateManagement.WestEurope"
+        },
+        "logManagementResourceGroupName":{
+            "value": "LogManagement.WestEurope"
+        },
+        "logManagementActionGroupName": {
+            "value": "AG-AZP-WorkloadAlerts-001"
+        },
+        "logManagementActionGroupShortName": {
+            "value": "AGAZP001"
+        },
+        "connectivityResourceGroupName":{
+            "value": "Networking.WestEurope.Hub"
+        },
+        "connectivitySubscriptionId":{
+            "value": "232bbf91-29aa-47c7-b9f0-fe8f80600608"
+        },
+        "virtualNetworkResourceGroupName":{
+            "value": "Network.WestEurope.Test"
+        },
+        "virtualNetworkName":{
+            "value": "WestEurope.Hub.Test"
+        },
+        "virtualNetworkAddressPrefix":{
+            "value": "10.0.2.0/24"
+        },
+        "sharedServicesSubnetAddressPrefix":{
+            "value": "10.0.2.0/26"
+        },
+        "location":{
+            "value": "westeurope"
+        },
+        "workbookDisplayName":{
+            "value": "WB-AZP-001"
+        },
+        "sharedDashboardName":{
+            "value": "SDB-AZP-001"
+        },
+        "keyVaultNameD": {
+            "value": "DKVAULT-AZP-001"
+        },
+        "keyVaultNameR": {
+            "value": "RKVAULT-AZP-002"
+        },
+        "updateManagementName":{
+            "value": "Updates(LAW-AZP-001)"
+        },
+        "actionGroupName": {
+            "value": "AUTOM-AGTT-001"
+        },
+        "actionGroupShortName": {
+            "value": "ALERTUPDMGMT"
+        },
+        "alertName": {
+            "value": "UpdateFailed"
+        },
+        "updateManagementGroupName": {
+            "value": "Update-MGMTT-001"
+        },
+        "actionGroupLocation": {
+            "value": "global"
+        }
+    }
+}

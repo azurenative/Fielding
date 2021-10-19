@@ -1,6 +1,13 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.4.613.9944",
+      "templateHash": "11643894440936286298"
+    }
+  },
   "parameters": {
     "location": {
       "type": "string"
@@ -14,6 +21,12 @@
   },
   "functions": [],
   "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2021-04-01",
+      "name": "[parameters('logManagementResourceGroupName')]",
+      "location": "[parameters('location')]"
+    },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
@@ -32,6 +45,13 @@
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.613.9944",
+              "templateHash": "7934538361194567665"
+            }
+          },
           "parameters": {
             "logAnalyticsName": {
               "type": "string"
@@ -118,6 +138,13 @@
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.613.9944",
+              "templateHash": "1593594213075863498"
+            }
+          },
           "parameters": {
             "workbookDisplayName": {
               "type": "string",
@@ -171,12 +198,5 @@
         }
       }
     }
-  ],
-  "metadata": {
-    "_generator": {
-      "name": "bicep",
-      "version": "0.3.126.58533",
-      "templateHash": "11113425009239888848"
-    }
-  }
+  ]
 }

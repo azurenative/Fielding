@@ -1,0 +1,96 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageAccountName": {
+      "value": "logflowstoragewesteutest"
+    },
+    "logAnalyticsName": {
+      "value": "LAW-AZPT-001"
+    },
+    "azureEnvironment": {
+      "value": "test"
+    },
+    "managedIdentityName": {
+      "value": "ManagedIdentityBlueprintAssignmentTest"
+    },
+    "managedIdentitiesResourceGroupName": {
+      "value": "ManagedIdentities.Test"
+    },
+    "secretManagementResourceGroupName": {
+      "value": "SecretManagement.WestEurope.Test"
+    },
+    "fileStagingstorageAccountName": {
+      "value": "sqnfstagingwetest"
+    },
+    "fileStagingResourceGroupName": {
+      "value": "FileStaging.WestEurope"
+    },
+    "updateManagementResourceGroupName": {
+      "value": "UpdateManagement.WestEurope.Test"
+    },
+    "logManagementResourceGroupName": {
+      "value": "LogManagement.WestEurope.Test"
+    },
+    "logManagementActionGroupName": {
+      "value": "AG-AZPT-WorkloadAlerts-001"
+    },
+    "logManagementActionGroupShortName": {
+      "value": "AGAZPT001"
+    },
+    "connectivityResourceGroupName": {
+      "value": "Networking.WestEurope.Hub.Test"
+    },
+    "connectivitySubscriptionId": {
+      "value": "1a7460ee-eb78-47d9-a7c1-9f10fdf3bec8"
+    },
+    "virtualNetworkResourceGroupName": {
+      "value": "Network.WestEurope.Test"
+    },
+    "virtualNetworkName": {
+      "value": "WestEurope.Hub.Test"
+    },
+    "virtualNetworkAddressPrefix": {
+      "value": "10.0.2.0/24"
+    },
+    "sharedServicesSubnetAddressPrefix": {
+      "value": "10.0.2.0/26"
+    },
+    "location": {
+      "value": "westeurope"
+    },
+    "automationAccountName": {
+      "value": "AUTOM-AZPT-001"
+    },
+    "updateManagementName": {
+      "value": "Updates(LAW-AZPT-001)"
+    },
+    "workbookDisplayName": {
+      "value": "WB-AZPT-001"
+    },
+    "sharedDashboardName": {
+      "value": "SDB-AZPT-001"
+    },
+    "keyVaultNameD": {
+      "value": "DKVAULT-AZPT-002"
+    },
+    "keyVaultNameR": {
+      "value": "RKVAULT-AZPT-001"
+    },
+    "actionGroupName": {
+      "value": "AUTOM-AGTT-001"
+    },
+    "actionGroupShortName": {
+      "value": "ALERTUPDMGMT"
+    },
+    "alertName": {
+      "value": "UpdateFailed"
+    },
+    "updateManagementGroupName": {
+      "value": "Update-MGMTT-001"
+    },
+    "actionGroupLocation": {
+      "value": "global"
+    }
+  }
+}

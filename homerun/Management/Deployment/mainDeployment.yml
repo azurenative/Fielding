@@ -1,0 +1,149 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - Resources/Management/Deployment/*
+      - Resources/Management/Modules/*
+
+pool:
+   vmImage: windows-latest
+
+variables:
+  TestweuParametersFile: $(System.DefaultWorkingDirectory)/drop/templates/parameters.we.test.json
+  TestneuParametersFile: $(System.DefaultWorkingDirectory)/drop/templates/parameters.ne.test.json
+  ProdweuParametersFile: $(System.DefaultWorkingDirectory)/drop/templates/parameters.we.prod.json
+  ProdneuParametersFile: $(System.DefaultWorkingDirectory)/drop/templates/parameters.ne.prod.json
+
+  DeploymentScope: 'Subscription'
+  Workingdirectory: '$(Build.SourcesDirectory)/Resources/Management/Modules'
+  TemplateFilePath: '$(Build.SourcesDirectory)/Resources/Management/Modules/mainDeployment.json'
+  MainTemplateFilePath: '$(System.DefaultWorkingDirectory)/drop/templates/mainDeployment.json'
+  UpdateServiceTemplateFilePath: '$(System.DefaultWorkingDirectory)/drop/templates/'
+
+
+  ProdAzureResourceManagerConnection: 'AzureInitiative Management Group'
+  ProdSubscriptionId: '8ab8730f-bf44-4119-bf7a-5e358a40fbc6'
+
+  TestAzureResourceManagerConnection: 'Test Management Group'
+  TestSubscriptionId: 'ce6b3c97-19ab-40dc-8672-636e1f20b74e'
+
+  ScriptsFolderPath: $(Build.SourcesDirectory)/Resources/Management/Scripts
+  ModulesFolderPath: $(Build.SourcesDirectory)/Resources/Management/Modules
+  ParameterFilesFolderPath: $(Build.SourcesDirectory)/Resources/Management/Deployment
+
+stages:
+  - stage: 'PublishTemplates'
+    displayName: 'PublishTemplates'
+    variables:
+      DeploymentScope: 'Subscription'
+      TemplateParameterFilePathWest: '$(Build.SourcesDirectory)/Resources/Management/Deployment/parameters.we.test.json'
+      TemplateParameterFilePathNorth: '$(Build.SourcesDirectory)/Resources/Management/Deployment/parameters.ne.test.json'
+
+    jobs:
+    - job: PublishTemplates
+      displayName: PublishTemplates
+      variables:
+        DECODE_PERCENTS: false
+      steps:
+      - checkout: self
+        path: 'src'
+
+      - task: AzureCLI@2
+        displayName: 'Build Bicep template'
+        inputs:
+          azureSubscription: '${{ variables.TestAzureResourceManagerConnection }}'
+          scriptType: ps
+          scriptLocation: inlineScript
+          inlineScript: |
+            az bicep build --file ${{variables.Workingdirectory}}\mainDeployment.bicep
+            az bicep build --file ${{variables.Workingdirectory}}\updateServiceLinux.bicep
+            az bicep build --file ${{variables.Workingdirectory}}\updateServiceWindows.bicep
+
+      - task: AzureResourceManagerTemplateDeployment@3
+        displayName: 'Validate ARM Template'
+        inputs:
+          deploymentScope: ${{ variables.DeploymentScope }}
+          azureResourceManagerConnection: ${{ variables.TestAzureResourceManagerConnection }}
+          subscriptionId: ${{ variables.TestSubscriptionId }}
+          location: 'westeurope'
+          action: 'Create Or Update Resource Group'
+          csmFile:  ${{ variables.TemplateFilePath }}
+          csmParametersFile: ${{ variables.TemplateParameterFilePathWest }}
+          deploymentMode: 'Validation'
+          deploymentName: 'ValidateARMTemplateWestEurope'
+
+      - task: CopyFiles@2
+        displayName: 'Copy templates to $(build.artifactstagingdirectory)/templates'
+        inputs:
+          SourceFolder: ${{ variables.ModulesFolderPath }}
+          Contents: '*.json'
+          TargetFolder: '$(build.artifactstagingdirectory)/templates'
+
+      - task: CopyFiles@2
+        displayName: 'Copy parameters to $(build.artifactstagingdirectory)/templates'
+        inputs:
+          SourceFolder: ${{ variables.ParameterFilesFolderPath }}
+          Contents: '*.json'
+          TargetFolder: '$(build.artifactstagingdirectory)/templates'
+
+      - task: CopyFiles@2
+        displayName: 'Copy scripts to $(build.artifactstagingdirectory)/scripts'
+        inputs:
+          SourceFolder: ${{ variables.ScriptsFolderPath }}
+          Contents: '*.ps1'
+          TargetFolder: '$(build.artifactstagingdirectory)/scripts'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact: drop'
+
+  - stage: DeployManagementNorthEuropeTest
+    displayName: Deploy Management North Europe Test
+    jobs:
+    - template: resourceDeployment.yml
+      parameters:
+        SubscriptionId: ${{ variables.TestSubscriptionId }}
+        Location: 'NorthEurope'
+        AzureResourceManagerConnection: ${{ variables.TestAzureResourceManagerConnection }}
+        csmFile: ${{variables.MainTemplateFilePath}}
+        csmParametersFile: '${{ variables.TestneuParametersFile }}'
+        UpdateServiceTemplateFilePath: ${{variables.UpdateServiceTemplateFilePath}}
+
+  - stage: DeployManagementWestEuropeTest
+    displayName: Deploy Management West Europe Test
+    jobs:
+    - template: resourceDeployment.yml
+      parameters:
+        SubscriptionId: ${{ variables.TestSubscriptionId }}
+        Location: 'WestEurope'
+        AzureResourceManagerConnection: ${{ variables.TestAzureResourceManagerConnection }}
+        csmFile: ${{variables.MainTemplateFilePath}}
+        csmParametersFile: ${{ variables.TestweuParametersFile }}
+        UpdateServiceTemplateFilePath: ${{variables.UpdateServiceTemplateFilePath}}
+
+  - stage: DeployManagementNorthEurope
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    displayName: Deploy Management North Europe Prod
+    jobs:
+    - template: resourceDeployment.yml
+      parameters:
+        SubscriptionId: ${{ variables.ProdSubscriptionId }}
+        Location: 'NorthEurope'
+        AzureResourceManagerConnection: ${{ variables.ProdAzureResourceManagerConnection }}
+        csmFile: ${{variables.MainTemplateFilePath}}
+        csmParametersFile: '${{ variables.ProdneuParametersFile }}'
+        UpdateServiceTemplateFilePath: ${{variables.UpdateServiceTemplateFilePath}}
+
+  - stage: DeployManagementWestEurope
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    displayName: Deploy Management West Europe Prod
+    jobs:
+    - template: resourceDeployment.yml
+      parameters:
+        SubscriptionId: ${{ variables.ProdSubscriptionId }}
+        Location: 'WestEurope'
+        AzureResourceManagerConnection: ${{ variables.ProdAzureResourceManagerConnection }}
+        csmFile: ${{variables.MainTemplateFilePath}}
+        csmParametersFile: '${{ variables.ProdweuParametersFile }}'
+        UpdateServiceTemplateFilePath: ${{variables.UpdateServiceTemplateFilePath}}
